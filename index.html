@@ -96,7 +96,7 @@
             background-clip: text;
         }
 
-        /* ===== CARD PRINCIPAL (comprimido) ===== */
+        /* ===== CARD PRINCIPAL ===== */
         .main-card {
             width: 100%;
             background: linear-gradient(145deg, rgba(0, 220, 130, 0.12), rgba(0, 180, 100, 0.04));
@@ -176,7 +176,7 @@
             }
         }
 
-        /* ===== TEXTO CONVINCENTE (comprimido) ===== */
+        /* ===== TEXTO CONVINCENTE ===== */
         .convince-text {
             width: 100%;
             text-align: left;
@@ -212,9 +212,13 @@
             line-height: 1.5;
         }
 
-        /* ===== VÍDEO PRINCIPAL ===== */
+        /* ===== VÍDEO / IMAGEM (tamanho original) ===== */
         .video-section {
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
         }
 
         .video-wrapper {
@@ -224,14 +228,45 @@
             overflow: hidden;
             box-shadow: 0 10px 36px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 220, 130, 0.12);
             background: #0b0f16;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .video-wrapper video {
+        .video-wrapper video,
+        .video-wrapper img {
             width: 100%;
-            aspect-ratio: 16 / 10;
-            object-fit: cover;
+            height: auto;
+            max-width: 100%;
             display: block;
             background: #0b0f16;
+            object-fit: contain;
+        }
+
+        /* ===== BOTÃO SECUNDÁRIO (por baixo do vídeo) ===== */
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 16px 24px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: all 0.25s ease;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(145deg, #00d88a, #00b36b);
+            color: #051008;
+            box-shadow: 0 6px 28px rgba(0, 200, 120, 0.5), 0 0 0 2px rgba(0, 220, 130, 0.25);
+            animation: pulse-green 2.2s infinite ease-in-out;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.97);
         }
 
         /* ===== FOOTER ===== */
@@ -262,7 +297,8 @@
             .hero {
                 padding: 26px 24px 30px;
             }
-            .btn-primary {
+            .btn-primary,
+            .btn-secondary {
                 max-width: 400px;
             }
         }
@@ -297,12 +333,12 @@
                 </div>
             </div>
 
-            <!-- BOTÃO PRINCIPAL -->
+            <!-- BOTÃO PRINCIPAL (topo) -->
             <a href="https://SEU-LINK-AQUI.com" target="_blank" rel="noopener" class="btn-primary">
                 ✦ Inscreva-se Agora
             </a>
 
-            <!-- TEXTO CONVINCENTE (comprimido) -->
+            <!-- TEXTO CONVINCENTE -->
             <div class="convince-text reveal">
                 <p>
                     Viva, ilustre! 👋 Sei que <strong>não existe forma mágica de ganhar dinheiro na internet sem dar duro</strong>. Mas com dedicação, pode criar uma <strong>renda extra</strong> real.
@@ -315,14 +351,19 @@
                 </div>
             </div>
 
-            <!-- VÍDEO PRINCIPAL (logo após o texto) -->
+            <!-- VÍDEO / IMAGEM (tamanho original) -->
             <div class="video-section reveal">
-                <div class="video-wrapper">
-                    <video id="heroVideo" muted playsinline webkit-playsinline poster="foto1.png">
+                <div class="video-wrapper" id="videoWrapper">
+                    <video id="heroVideo" muted playsinline webkit-playsinline poster="imagem1.png">
                         <source src="video1.mp4" type="video/mp4">
                     </video>
                 </div>
             </div>
+
+            <!-- BOTÃO SECUNDÁRIO (por baixo do card de vídeo) -->
+            <a href="https://SEU-LINK-AQUI.com" target="_blank" rel="noopener" class="btn-secondary reveal">
+                ✦ Clica para se Inscrever
+            </a>
 
         </div>
     </header>
@@ -336,58 +377,47 @@
     <!-- ===== JAVASCRIPT ===== -->
     <script>
         (function() {
-            // ---- SEQUÊNCIA DE VÍDEOS ----
+            // ---- VÍDEO ÚNICO → depois imagem ----
             const heroVideo = document.getElementById('heroVideo');
-            const video1 = 'video1.mp4';
-            const video2 = 'video2.mp4';
-            const posterImage = 'foto1.png';
+            const videoSource = 'video1.mp4';
+            const imagePoster = 'imagem1.png';
 
-            let currentVideoIndex = 0;
-
-            function loadVideo(src) {
-                heroVideo.src = src;
+            function loadVideo() {
+                heroVideo.src = videoSource;
                 heroVideo.load();
                 heroVideo.play().catch(() => {});
             }
 
             function onVideoEnd() {
-                if (currentVideoIndex === 0) {
-                    currentVideoIndex = 1;
-                    loadVideo(video2);
-                } else {
-                    heroVideo.pause();
-                    heroVideo.removeAttribute('src');
-                    heroVideo.load();
-                    heroVideo.poster = posterImage;
-                    heroVideo.style.background = `#0b0f16 url('${posterImage}') center/cover no-repeat`;
-                    heroVideo.style.objectFit = 'cover';
-                    heroVideo.style.backgroundColor = '#0b0f16';
-                    heroVideo.controls = false;
-                }
+                // Substitui o vídeo por uma imagem estática
+                heroVideo.pause();
+                heroVideo.removeAttribute('src');
+                heroVideo.load();
+                heroVideo.poster = imagePoster;
+                heroVideo.style.background = `#0b0f16 url('${imagePoster}') center/contain no-repeat`;
+                heroVideo.style.objectFit = 'contain';
+                heroVideo.style.backgroundColor = '#0b0f16';
+                heroVideo.controls = false;
             }
 
-            function initHeroVideo() {
-                heroVideo.poster = posterImage;
+            function initVideo() {
+                heroVideo.poster = imagePoster;
                 heroVideo.style.background = 'transparent';
                 heroVideo.controls = false;
-                currentVideoIndex = 0;
-                loadVideo(video1);
+                loadVideo();
                 heroVideo.addEventListener('ended', onVideoEnd);
             }
 
             heroVideo.addEventListener('error', function() {
-                if (currentVideoIndex === 0) loadVideo(video1);
-                else loadVideo(video2);
+                loadVideo();
             });
 
+            // Observa visibilidade para pausar/continuar
             const videoObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         if (heroVideo.src && heroVideo.paused) {
                             heroVideo.play().catch(() => {});
-                        } else if (!heroVideo.src) {
-                            if (currentVideoIndex === 0) loadVideo(video1);
-                            else loadVideo(video2);
                         }
                     } else {
                         heroVideo.pause();
@@ -396,7 +426,7 @@
             }, { threshold: 0.15 });
 
             videoObserver.observe(heroVideo);
-            initHeroVideo();
+            initVideo();
 
             // ---- REVEAL ----
             const revealElements = document.querySelectorAll('.reveal');
